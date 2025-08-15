@@ -1,3 +1,5 @@
+// Main exports
 export * from './types.module';
-export * from './types.service';
+
+// Interface exports (organized by category)
 export * from './interfaces';

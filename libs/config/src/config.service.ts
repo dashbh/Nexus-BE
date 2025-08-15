@@ -1,56 +1,5 @@
 import { Injectable } from '@nestjs/common';
-
-export interface DatabaseConfig {
-  host: string;
-  port: number;
-  username: string;
-  password: string;
-  database: string;
-  synchronize: boolean;
-  logging: boolean;
-}
-
-export interface RedisConfig {
-  host: string;
-  port: number;
-  password?: string;
-  db: number;
-}
-
-export interface KafkaConfig {
-  brokers: string[];
-  clientId: string;
-  groupId: string;
-  ssl?: boolean;
-  sasl?: {
-    mechanism: string;
-    username: string;
-    password: string;
-  };
-}
-
-export interface JwtConfig {
-  secret: string;
-  expiresIn: string;
-  refreshSecret: string;
-  refreshExpiresIn: string;
-}
-
-export interface AppConfig {
-  port: number;
-  environment: string;
-  corsOrigins: string[];
-  rateLimitMax: number;
-  rateLimitWindowMs: number;
-}
-
-export interface NexusConfig {
-  app: AppConfig;
-  database: DatabaseConfig;
-  redis: RedisConfig;
-  kafka: KafkaConfig;
-  jwt: JwtConfig;
-}
+import { NexusConfig } from './interfaces/nexus.config';
 
 @Injectable()
 export class ConfigService {
