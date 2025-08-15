@@ -1,0 +1,63 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@nexus/config": [
+        "libs/config/src"
+      ],
+      "@nexus/config/*": [
+        "libs/config/src/*"
+      ],
+      "@nexus/errors": [
+        "libs/errors/src"
+      ],
+      "@nexus/errors/*": [
+        "libs/errors/src/*"
+      ],
+      "@nexus/proto": [
+        "libs/proto/src"
+      ],
+      "@nexus/proto/*": [
+        "libs/proto/src/*"
+      ],
+      "@nexus/types": [
+        "libs/types/src"
+      ],
+      "@nexus/types/*": [
+        "libs/types/src/*"
+      ],
+      "@nexus/utils": [
+        "libs/utils/src"
+      ],
+      "@nexus/utils/*": [
+        "libs/utils/src/*"
+      ],
+      "@nexus/validation": [
+        "libs/validation/src"
+      ],
+      "@nexus/validation/*": [
+        "libs/validation/src/*"
+      ]
+    }
+  }
+}
