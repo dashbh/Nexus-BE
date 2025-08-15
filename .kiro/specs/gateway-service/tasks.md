@@ -109,7 +109,7 @@
   - Set up hot reload and debugging for development
   - Create container health checks and startup probes
   - Configure logging and metrics collection in containers
-  - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7_
+  - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7_
 
 - [ ] 13. Write comprehensive unit tests for all modules
   - Create unit tests for authentication service and controllers
@@ -139,7 +139,7 @@
   - Set up automated API documentation generation in CI/CD pipeline
   - Create GraphQL schema documentation with GraphQL Playground
   - Document WebSocket events and message formats
-  - _Requirements: 3.1, 3.2, 3.3, 4.1, 4.2, 4.3, 5.1, 5.2_
+  - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7_
 
 - [ ] 16. Set up performance testing and optimization
   - Create load tests for authentication endpoints

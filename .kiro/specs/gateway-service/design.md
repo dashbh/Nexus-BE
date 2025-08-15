@@ -134,10 +134,28 @@ export interface RedisConfig {
   password?: string;
 }
 
+export interface KafkaConfig {
+  brokers: string[];
+  clientId: string;
+  groupId: string;
+  ssl?: boolean;
+  sasl?: {
+    mechanism: string;
+    username: string;
+    password: string;
+  };
+}
+
 export const configuration = () => ({
   database: {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT, 10) || 5432,
+    // ... other config
+  },
+  kafka: {
+    brokers: process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'],
+    clientId: process.env.KAFKA_CLIENT_ID || 'nexus-gateway',
+    groupId: process.env.KAFKA_GROUP_ID || 'nexus-gateway-group',
     // ... other config
   },
 });
@@ -174,6 +192,17 @@ export const configuration = () => ({
   - SessionManager: WebSocket session state management
   - EventHandler: Real-time event processing
   - PresenceService: User presence tracking
+
+#### Kafka Event Streaming Module
+
+- **Purpose**: Event-driven communication and message streaming
+- **Generated with**: `nest g module kafka` in gateway-svc
+- **Components**:
+  - KafkaProducerService: Event publishing to Kafka topics
+  - KafkaConsumerService: Event consumption and processing
+  - EventSerializer: Message serialization/deserialization
+  - TopicManager: Topic creation and management
+  - DeadLetterHandler: Failed message processing
 
 #### Security Module
 
@@ -342,6 +371,50 @@ export enum ErrorCodes {
 2. Implement rate limiting and security middleware
 3. Set up comprehensive logging and monitoring
 4. Implement circuit breaker patterns
+
+## API Documentation
+
+### Swagger/OpenAPI Integration
+
+The Gateway Service will provide comprehensive API documentation using Swagger/OpenAPI:
+
+#### REST API Documentation
+
+```typescript
+// Example controller with OpenAPI decorators
+@ApiTags('authentication')
+@Controller('auth')
+export class AuthController {
+  @Post('login')
+  @ApiOperation({ summary: 'User login' })
+  @ApiBody({ type: LoginDto })
+  @ApiResponse({ status: 200, description: 'Login successful', type: LoginResponseDto })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
+    // Implementation
+  }
+}
+```
+
+#### Documentation Components
+
+- **Interactive Swagger UI**: Available at `/api/docs` for testing endpoints
+- **OpenAPI Schema**: Auto-generated from decorators and DTOs
+- **Authentication Documentation**: JWT token usage and security schemes
+- **Error Response Documentation**: Standardized error formats and codes
+- **Request/Response Examples**: Real-world usage examples for all endpoints
+
+#### GraphQL Documentation
+
+- **GraphQL Playground**: Interactive query testing interface
+- **Schema Documentation**: Auto-generated from resolvers and types
+- **Subscription Documentation**: Real-time event schema definitions
+
+#### WebSocket Documentation
+
+- **Event Documentation**: Message formats and event types
+- **Connection Guide**: Authentication and session management
+- **Real-time Flow Examples**: Common usage patterns
 
 ### NestJS CLI Usage Strategy
 

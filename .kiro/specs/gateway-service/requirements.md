@@ -65,6 +65,20 @@ The Gateway Service serves as the primary entry point for the Nexus trading plat
 
 ### Requirement 5
 
+**User Story:** As a system, I want Kafka event streaming integration for reliable event-driven communication, so that the Gateway can publish and consume events across the distributed architecture.
+
+#### Acceptance Criteria
+
+1. WHEN Gateway Service starts THEN it SHALL establish Kafka producer and consumer connections
+2. WHEN user authentication events occur THEN the Gateway SHALL publish events to appropriate Kafka topics
+3. WHEN system events are received from Kafka THEN the Gateway SHALL process and route them appropriately
+4. WHEN event publishing fails THEN the Gateway SHALL implement retry logic and dead letter queues
+5. WHEN consuming events THEN the Gateway SHALL handle message deduplication and ordering
+6. WHEN Kafka connection fails THEN the Gateway SHALL implement reconnection and buffering strategies
+7. WHEN events are processed THEN the Gateway SHALL maintain event sourcing and audit trails
+
+### Requirement 6
+
 **User Story:** As a client, I want real-time communication through WebSockets, so that I can receive live trading updates and notifications.
 
 #### Acceptance Criteria
@@ -77,7 +91,7 @@ The Gateway Service serves as the primary entry point for the Nexus trading plat
 6. WHEN service sends real-time update THEN the Gateway SHALL deliver via WebSocket to clients
 7. WHEN connection fails THEN the Gateway SHALL implement reconnection and message queuing
 
-### Requirement 6
+### Requirement 7
 
 **User Story:** As a system, I want comprehensive security middleware and monitoring, so that the platform is protected against attacks and performance issues are detected.
 
@@ -91,7 +105,7 @@ The Gateway Service serves as the primary entry point for the Nexus trading plat
 6. WHEN performance monitoring is needed THEN the Gateway SHALL track response times and error rates
 7. WHEN system health is checked THEN the Gateway SHALL provide comprehensive health endpoints
 
-### Requirement 7
+### Requirement 8
 
 **User Story:** As a microservice, I want to communicate with other services through the Gateway's service mesh, so that inter-service communication is secure and reliable.
 
@@ -105,7 +119,21 @@ The Gateway Service serves as the primary entry point for the Nexus trading plat
 6. WHEN load balancing is needed THEN the Gateway SHALL distribute requests across service instances
 7. WHEN service health changes THEN the Gateway SHALL update routing and availability
 
-### Requirement 8
+### Requirement 9
+
+**User Story:** As a developer, I want comprehensive API documentation with Swagger/OpenAPI, so that I can understand and integrate with all Gateway Service endpoints.
+
+#### Acceptance Criteria
+
+1. WHEN REST endpoints are created THEN they SHALL be documented with OpenAPI decorators
+2. WHEN API documentation is generated THEN it SHALL include request/response schemas
+3. WHEN Swagger UI is accessed THEN it SHALL provide interactive API testing capabilities
+4. WHEN authentication endpoints are documented THEN they SHALL include security requirements
+5. WHEN GraphQL schema is created THEN it SHALL be documented with GraphQL Playground
+6. WHEN WebSocket events are implemented THEN they SHALL be documented with message formats
+7. WHEN API changes are made THEN documentation SHALL be automatically updated
+
+### Requirement 10
 
 **User Story:** As a developer, I want Docker containerization and development environment setup, so that the Gateway Service can be deployed consistently across environments.
 
