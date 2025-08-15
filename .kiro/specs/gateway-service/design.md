@@ -7,32 +7,120 @@ The Gateway Service serves as the primary entry point for the Nexus trading plat
 ## Architecture
 
 ### High-Level Architecture
-
 ```mermaid
 graph TB
-    Client[Client Applications] --> Gateway[Gateway Service]
-    Gateway --> Auth[Authentication Module]
-    Gateway --> API[API Gateway Module]
-    Gateway --> WS[WebSocket Module]
-    Gateway --> Security[Security Module]
+    %% Client Layer
+    subgraph "Client Layer"
+        WebApp[🌐 Web Application]
+        MobileApp[📱 Mobile App]
+        ThirdParty[🔗 Third Party APIs]
+    end
 
-    Auth --> Redis[(Redis Session Store)]
-    Auth --> DB[(PostgreSQL)]
+    %% Gateway Service Core
+    subgraph "Gateway Service"
+        direction TB
+        Gateway[🚪 Gateway Core]
+        
+        subgraph "Core Modules"
+            Auth[🔐 Authentication Module]
+            API[🔄 API Gateway Module]
+            WS[⚡ WebSocket Module]
+            Kafka[📨 Kafka Module]
+            Security[🛡️ Security Module]
+        end
+    end
 
-    API --> Trading[Trading Service gRPC]
-    API --> FinData[FinData Service gRPC]
-    API --> Notification[Notification Service gRPC]
+    %% External Services
+    subgraph "External Infrastructure"
+        Redis[(🗄️ Redis<br/>Session Store)]
+        DB[(🗃️ PostgreSQL<br/>User Database)]
+        KafkaCluster[(📊 Kafka Cluster<br/>Event Streaming)]
+    end
 
-    WS --> Kafka[(Kafka Event Stream)]
+    %% Backend Services
+    subgraph "Backend Services (gRPC)"
+        Trading[📈 Trading Service]
+        FinData[💹 FinData Service]
+        Notification[🔔 Notification Service]
+        UserMgmt[👤 User Management]
+    end
+
+    %% Common Packages
+    subgraph "Shared Libraries"
+        direction LR
+        Validation[✅ @nexus/validation]
+        Types[🏷️ @nexus/types]
+        Utils[🔧 @nexus/utils]
+        Proto[📋 @nexus/proto]
+        Errors[❌ @nexus/errors]
+        Config[⚙️ @nexus/config]
+    end
+
+    %% Client Connections
+    WebApp --> Gateway
+    MobileApp --> Gateway
+    ThirdParty --> Gateway
+
+    %% Gateway Internal Flow
+    Gateway --> Auth
+    Gateway --> API
+    Gateway --> WS
+    Gateway --> Kafka
+    Gateway --> Security
+
+    %% Authentication Flow
+    Auth --> Redis
+    Auth --> DB
+    Auth --> UserMgmt
+
+    %% API Gateway Flow
+    API --> Trading
+    API --> FinData
+    API --> Notification
+    API --> UserMgmt
+
+    %% WebSocket Flow
     WS --> Redis
+    WS --> KafkaCluster
 
-    Gateway --> Common[Common Packages]
-    Common --> Validation[nexus/validation]
-    Common --> Types[nexus/types]
-    Common --> Utils[nexus/utils]
-    Common --> Proto[nexus/proto]
-    Common --> Errors[nexus/errors]
-    Common --> Config[nexus/config]
+    %% Kafka Integration
+    Kafka --> KafkaCluster
+    Kafka --> Trading
+    Kafka --> FinData
+    Kafka --> Notification
+
+    %% Security Integration
+    Security --> Redis
+    Security --> DB
+
+    %% Shared Libraries Usage
+    Auth -.-> Validation
+    Auth -.-> Types
+    Auth -.-> Errors
+    API -.-> Proto
+    API -.-> Types
+    API -.-> Utils
+    WS -.-> Types
+    WS -.-> Config
+    Kafka -.-> Types
+    Kafka -.-> Config
+    Security -.-> Config
+    Security -.-> Errors
+
+    %% Styling
+    classDef clientStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef gatewayStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef moduleStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef dbStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef serviceStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef libStyle fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
+
+    class WebApp,MobileApp,ThirdParty clientStyle
+    class Gateway gatewayStyle
+    class Auth,API,WS,Kafka,Security moduleStyle
+    class Redis,DB,KafkaCluster dbStyle
+    class Trading,FinData,Notification,UserMgmt serviceStyle
+    class Validation,Types,Utils,Proto,Errors,Config libStyle
 ```
 
 ### Monorepo Structure Integration
