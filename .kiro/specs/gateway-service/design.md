@@ -275,6 +275,58 @@ interface WebSocketSession {
 // TTL: Connection lifetime + 5 minutes
 ```
 
+### Kafka Event Models
+
+```typescript
+// Base event interface
+interface BaseEvent {
+  eventId: string;
+  eventType: string;
+  timestamp: Date;
+  correlationId: string;
+  userId?: string;
+  metadata?: Record<string, any>;
+}
+
+// Authentication events
+interface UserLoginEvent extends BaseEvent {
+  eventType: 'user.login';
+  payload: {
+    userId: string;
+    email: string;
+    loginTime: Date;
+    ipAddress: string;
+    userAgent: string;
+  };
+}
+
+interface UserLogoutEvent extends BaseEvent {
+  eventType: 'user.logout';
+  payload: {
+    userId: string;
+    sessionDuration: number;
+  };
+}
+
+// System events
+interface ServiceHealthEvent extends BaseEvent {
+  eventType: 'service.health';
+  payload: {
+    serviceName: string;
+    status: 'healthy' | 'unhealthy';
+    metrics: Record<string, number>;
+  };
+}
+
+// Topic configuration
+export const KAFKA_TOPICS = {
+  USER_EVENTS: 'nexus.user.events',
+  SYSTEM_EVENTS: 'nexus.system.events',
+  AUDIT_EVENTS: 'nexus.audit.events',
+  NOTIFICATION_EVENTS: 'nexus.notification.events',
+} as const;
+```
+
 ## Error Handling
 
 ### Standardized Error Response Format
@@ -372,6 +424,215 @@ export enum ErrorCodes {
 3. Set up comprehensive logging and monitoring
 4. Implement circuit breaker patterns
 
+## Kafka Event Streaming Integration
+
+### Event-Driven Architecture
+
+The Gateway Service implements comprehensive Kafka integration for reliable event-driven communication across the distributed system.
+
+#### Kafka Producer Service
+
+```typescript
+@Injectable()
+export class KafkaProducerService {
+  private producer: Producer;
+
+  async publishEvent<T extends BaseEvent>(
+    topic: string,
+    event: T,
+  ): Promise<void> {
+    try {
+      await this.producer.send({
+        topic,
+        messages: [
+          {
+            key: event.correlationId,
+            value: JSON.stringify(event),
+            headers: {
+              eventType: event.eventType,
+              timestamp: event.timestamp.toISOString(),
+            },
+          },
+        ],
+      });
+    } catch (error) {
+      // Implement retry logic and dead letter queue
+      await this.handlePublishError(topic, event, error);
+    }
+  }
+
+  private async handlePublishError<T extends BaseEvent>(
+    topic: string,
+    event: T,
+    error: Error,
+  ): Promise<void> {
+    // Retry logic with exponential backoff
+    // Dead letter queue for failed events
+    // Error logging and monitoring
+  }
+}
+```
+
+#### Kafka Consumer Service
+
+```typescript
+@Injectable()
+export class KafkaConsumerService implements OnModuleInit {
+  private consumer: Consumer;
+
+  async onModuleInit() {
+    await this.consumer.subscribe({
+      topics: Object.values(KAFKA_TOPICS),
+      fromBeginning: false,
+    });
+
+    await this.consumer.run({
+      eachMessage: async ({ topic, partition, message }) => {
+        await this.processMessage(topic, message);
+      },
+    });
+  }
+
+  private async processMessage(
+    topic: string,
+    message: KafkaMessage,
+  ): Promise<void> {
+    try {
+      const event = JSON.parse(message.value.toString()) as BaseEvent;
+
+      // Route to appropriate handler based on event type
+      await this.routeEvent(topic, event);
+
+      // Commit offset after successful processing
+    } catch (error) {
+      // Handle processing errors
+      await this.handleProcessingError(topic, message, error);
+    }
+  }
+
+  private async routeEvent(topic: string, event: BaseEvent): Promise<void> {
+    switch (event.eventType) {
+      case 'user.login':
+        await this.handleUserLogin(event as UserLoginEvent);
+        break;
+      case 'service.health':
+        await this.handleServiceHealth(event as ServiceHealthEvent);
+        break;
+      // Additional event handlers
+    }
+  }
+}
+```
+
+#### Event Serialization and Schema Management
+
+```typescript
+@Injectable()
+export class EventSerializer {
+  serialize<T extends BaseEvent>(event: T): Buffer {
+    // Implement Avro or JSON serialization
+    return Buffer.from(JSON.stringify(event));
+  }
+
+  deserialize<T extends BaseEvent>(data: Buffer): T {
+    // Implement deserialization with schema validation
+    return JSON.parse(data.toString()) as T;
+  }
+
+  validateSchema<T extends BaseEvent>(event: T): boolean {
+    // Schema validation logic
+    return true;
+  }
+}
+```
+
+#### Topic Management and Configuration
+
+```typescript
+@Injectable()
+export class TopicManager {
+  private admin: Admin;
+
+  async createTopics(): Promise<void> {
+    const topics = Object.values(KAFKA_TOPICS).map((topic) => ({
+      topic,
+      numPartitions: 3,
+      replicationFactor: 2,
+      configEntries: [
+        { name: 'cleanup.policy', value: 'delete' },
+        { name: 'retention.ms', value: '604800000' }, // 7 days
+      ],
+    }));
+
+    await this.admin.createTopics({ topics });
+  }
+
+  async getTopicMetadata(topic: string): Promise<TopicMetadata> {
+    const metadata = await this.admin.fetchTopicMetadata({ topics: [topic] });
+    return metadata.topics[0];
+  }
+}
+```
+
+#### Dead Letter Queue Handling
+
+```typescript
+@Injectable()
+export class DeadLetterHandler {
+  async handleFailedMessage(
+    originalTopic: string,
+    message: KafkaMessage,
+    error: Error,
+    retryCount: number,
+  ): Promise<void> {
+    const dlqTopic = `${originalTopic}.dlq`;
+
+    const dlqMessage = {
+      ...message,
+      headers: {
+        ...message.headers,
+        'original-topic': originalTopic,
+        'error-message': error.message,
+        'retry-count': retryCount.toString(),
+        'failed-at': new Date().toISOString(),
+      },
+    };
+
+    await this.producer.send({
+      topic: dlqTopic,
+      messages: [dlqMessage],
+    });
+  }
+
+  async reprocessDLQMessages(dlqTopic: string): Promise<void> {
+    // Implement DLQ message reprocessing logic
+  }
+}
+```
+
+### Event Flow Patterns
+
+#### Authentication Event Flow
+
+1. **User Login**: Gateway publishes `user.login` event to `nexus.user.events`
+2. **Session Creation**: Event triggers session creation in Redis
+3. **Audit Logging**: Security service consumes event for audit trail
+4. **Notification**: Notification service sends welcome message
+
+#### Real-time Event Broadcasting
+
+1. **Service Event**: Backend service publishes event to Kafka
+2. **Gateway Consumption**: Gateway consumes event from topic
+3. **WebSocket Broadcast**: Gateway broadcasts to connected clients
+4. **State Synchronization**: Client state updated in real-time
+
+#### System Health Monitoring
+
+1. **Health Check**: Services publish health events periodically
+2. **Monitoring**: Gateway aggregates health data
+3. **Alerting**: Unhealthy services trigger alerts
+4. **Circuit Breaker**: Gateway adjusts routing based on health
+
 ## API Documentation
 
 ### Swagger/OpenAPI Integration
@@ -388,7 +649,11 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'User login' })
   @ApiBody({ type: LoginDto })
-  @ApiResponse({ status: 200, description: 'Login successful', type: LoginResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Login successful',
+    type: LoginResponseDto,
+  })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
     // Implementation
