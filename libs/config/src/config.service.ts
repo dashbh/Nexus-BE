@@ -63,29 +63,31 @@ export class ConfigService {
   private loadConfiguration(): NexusConfig {
     return {
       app: {
-        port: parseInt(process.env.PORT, 10) || 3000,
+        port: parseInt(process.env.PORT || '3000', 10),
         environment: process.env.NODE_ENV || 'development',
         corsOrigins: process.env.CORS_ORIGINS?.split(',') || [
           'http://localhost:3000',
         ],
-        rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX, 10) || 100,
-        rateLimitWindowMs:
-          parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 900000, // 15 minutes
+        rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),
+        rateLimitWindowMs: parseInt(
+          process.env.RATE_LIMIT_WINDOW_MS || '900000',
+          10,
+        ), // 15 minutes
       },
       database: {
         host: process.env.DB_HOST || 'localhost',
-        port: parseInt(process.env.DB_PORT, 10) || 5432,
+        port: parseInt(process.env.DB_PORT || '5432', 10),
         username: process.env.DB_USERNAME || 'postgres',
         password: process.env.DB_PASSWORD || 'password',
         database: process.env.DB_DATABASE || 'nexus',
-        synchronize: process.env.DB_SYNCHRONIZE === 'true' || false,
-        logging: process.env.DB_LOGGING === 'true' || false,
+        synchronize: process.env.DB_SYNCHRONIZE === 'true',
+        logging: process.env.DB_LOGGING === 'true',
       },
       redis: {
         host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+        port: parseInt(process.env.REDIS_PORT || '6379', 10),
         password: process.env.REDIS_PASSWORD,
-        db: parseInt(process.env.REDIS_DB, 10) || 0,
+        db: parseInt(process.env.REDIS_DB || '0', 10),
       },
       kafka: {
         brokers: process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'],
@@ -95,8 +97,8 @@ export class ConfigService {
         sasl: process.env.KAFKA_SASL_MECHANISM
           ? {
               mechanism: process.env.KAFKA_SASL_MECHANISM,
-              username: process.env.KAFKA_SASL_USERNAME,
-              password: process.env.KAFKA_SASL_PASSWORD,
+              username: process.env.KAFKA_SASL_USERNAME || '',
+              password: process.env.KAFKA_SASL_PASSWORD || '',
             }
           : undefined,
       },
