@@ -15,10 +15,11 @@ describe('GatewaySvcController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
+  it('/ (GET)', async () => {
+    const response = await request(app.getHttpServer())
       .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      .expect(200);
+    
+    expect(response.text).toBe('Hello World!');
   });
 });
