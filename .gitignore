@@ -54,3 +54,32 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Docker volumes and data
+docker/postgres/data/
+docker/redis/data/
+docker/kafka/data/
+docker/zookeeper/data/
+docker/prometheus/data/
+docker/grafana/data/
+docker/pgadmin/data/
+
+# Docker logs
+docker/nginx/logs/
+apps/gateway-svc/logs/
+
+# SSL certificates (should be managed externally)
+docker/nginx/ssl/*.pem
+docker/nginx/ssl/*.key
+docker/nginx/ssl/*.crt
+
+# Backup files
+*.backup
+*.bak
+*.swp
+*.swo
+*~

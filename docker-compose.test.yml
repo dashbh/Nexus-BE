@@ -1,0 +1,137 @@
+version: '3.8'
+
+services:
+  # Gateway Service for Testing
+  gateway-svc-test:
+    build:
+      context: .
+      dockerfile: apps/gateway-svc/Dockerfile
+      target: development
+    container_name: nexus-gateway-svc-test
+    environment:
+      - NODE_ENV=test
+      - PORT=3000
+      - LOG_LEVEL=error
+      # Test Database
+      - DB_HOST=postgres-test
+      - DB_PORT=5432
+      - DB_USERNAME=test_user
+      - DB_PASSWORD=test_password
+      - DB_DATABASE=nexus_test
+      - DB_SYNCHRONIZE=true
+      - DB_LOGGING=false
+      # Test Redis
+      - REDIS_HOST=redis-test
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=test_password
+      - REDIS_DB=1
+      # Test JWT
+      - JWT_SECRET=test_jwt_secret
+      - JWT_REFRESH_SECRET=test_refresh_secret
+      # Test Kafka
+      - KAFKA_BROKERS=kafka-test:9092
+      - KAFKA_CLIENT_ID=nexus-gateway-test
+      - KAFKA_GROUP_ID=nexus-gateway-test-group
+    volumes:
+      - ./apps/gateway-svc/src:/app/apps/gateway-svc/src:ro
+      - ./libs:/app/libs:ro
+      - ./apps/gateway-svc/test:/app/apps/gateway-svc/test:ro
+      - /app/node_modules
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      kafka-test:
+        condition: service_healthy
+    networks:
+      - nexus-test-network
+    command: ["npm", "run", "test:e2e"]
+
+  # Test PostgreSQL Database
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: nexus-postgres-test
+    environment:
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_password
+      - POSTGRES_DB=nexus_test
+    tmpfs:
+      - /var/lib/postgresql/data
+    networks:
+      - nexus-test-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d nexus_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # Test Redis
+  redis-test:
+    image: redis:7-alpine
+    container_name: nexus-redis-test
+    command: redis-server --requirepass test_password
+    tmpfs:
+      - /data
+    networks:
+      - nexus-test-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # Test Zookeeper
+  zookeeper-test:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: nexus-zookeeper-test
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    tmpfs:
+      - /var/lib/zookeeper/data
+      - /var/lib/zookeeper/log
+    networks:
+      - nexus-test-network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo 'ruok' | nc localhost 2181"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # Test Kafka
+  kafka-test:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: nexus-kafka-test
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-test:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-test:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+    tmpfs:
+      - /var/lib/kafka/data
+    depends_on:
+      zookeeper-test:
+        condition: service_healthy
+    networks:
+      - nexus-test-network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+networks:
+  nexus-test-network:
+    driver: bridge
