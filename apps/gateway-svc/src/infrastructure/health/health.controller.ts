@@ -62,7 +62,7 @@ export class HealthController {
           {} as Record<string, string>,
         ),
       };
-    } catch (error) {
+    } catch {
       return {
         status: 'error',
         timestamp: new Date().toISOString(),
