@@ -10,47 +10,8 @@ services:
     container_name: nexus-gateway-svc-prod
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - LOG_LEVEL=info
-      # Database - Use external managed database in production
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT:-5432}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_DATABASE=${DB_DATABASE}
-      - DB_SYNCHRONIZE=false
-      - DB_LOGGING=false
-      - DB_SSL=true
-      # Redis - Use external managed Redis in production
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT:-6379}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - REDIS_DB=${REDIS_DB:-0}
-      - REDIS_TLS=true
-      # JWT
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-15m}
-      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
-      - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN:-7d}
-      # Kafka - Use external managed Kafka in production
-      - KAFKA_BROKERS=${KAFKA_BROKERS}
-      - KAFKA_CLIENT_ID=${KAFKA_CLIENT_ID:-nexus-gateway-prod}
-      - KAFKA_GROUP_ID=${KAFKA_GROUP_ID:-nexus-gateway-prod-group}
-      - KAFKA_SSL=${KAFKA_SSL:-true}
-      - KAFKA_SASL_MECHANISM=${KAFKA_SASL_MECHANISM}
-      - KAFKA_SASL_USERNAME=${KAFKA_SASL_USERNAME}
-      - KAFKA_SASL_PASSWORD=${KAFKA_SASL_PASSWORD}
-      # Rate Limiting
-      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
-      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
-      # CORS
-      - CORS_ORIGINS=${CORS_ORIGINS}
-      # Monitoring
-      - METRICS_ENABLED=true
-      - TRACING_ENABLED=true
-      - JAEGER_ENDPOINT=${JAEGER_ENDPOINT}
+    env_file:
+      - ./env/.env.production
     volumes:
       - ./apps/gateway-svc/logs:/app/logs
     networks:
@@ -71,7 +32,7 @@ services:
         max_attempts: 3
         window: 120s
     healthcheck:
-      test: ["CMD", "node", "dist/apps/gateway-svc/scripts/health-check.js"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health/ready"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -99,7 +60,7 @@ services:
       - nexus-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health/ready"]
       interval: 30s
       timeout: 10s
       retries: 3

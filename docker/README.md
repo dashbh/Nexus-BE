@@ -166,7 +166,7 @@ The Gateway Service supports hot reload in development:
 
 ```bash
 # Watch mode with hot reload
-docker-compose exec gateway-svc npm run start:dev
+docker-compose exec gateway-svc npm run dev
 
 # Debug mode with hot reload
 docker-compose exec gateway-svc npm run start:debug

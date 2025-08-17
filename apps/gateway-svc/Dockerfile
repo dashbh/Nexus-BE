@@ -100,4 +100,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
 ENTRYPOINT ["dumb-init", "--"]
 
 # Start in development mode with hot reload and debugging
-CMD ["npm", "run", "start:debug"]
+CMD ["npm", "run", "dev"]

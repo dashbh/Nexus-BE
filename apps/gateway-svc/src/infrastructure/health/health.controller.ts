@@ -38,36 +38,4 @@ export class HealthController {
   liveness(): Promise<HealthCheckResult> {
     return this.health.check([]);
   }
-
-  @Get('simple')
-  async simpleCheck(): Promise<{
-    status: string;
-    timestamp: string;
-    services: Record<string, string>;
-  }> {
-    try {
-      const result = await this.health.check([
-        () => this.db.isHealthy('database'),
-        () => this.redis.isHealthy('redis'),
-      ]);
-
-      return {
-        status: result.status,
-        timestamp: new Date().toISOString(),
-        services: Object.keys(result.details).reduce(
-          (acc, key) => {
-            acc[key] = result.details[key].status;
-            return acc;
-          },
-          {} as Record<string, string>,
-        ),
-      };
-    } catch {
-      return {
-        status: 'error',
-        timestamp: new Date().toISOString(),
-        services: {},
-      };
-    }
-  }
 }

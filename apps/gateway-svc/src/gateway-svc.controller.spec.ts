@@ -7,7 +7,9 @@ describe('GatewaySvcController', () => {
   let gatewaySvcService: GatewaySvcService;
 
   const mockGatewaySvcService = {
-    getHello: jest.fn().mockResolvedValue('Hello from Gateway Service! Environment: test'),
+    getHello: jest
+      .fn()
+      .mockResolvedValue('Hello from Gateway Service! Environment: test'),
     getStatus: jest.fn().mockReturnValue({
       service: 'gateway-svc',
       environment: 'test',

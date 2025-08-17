@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Gateway Service
   gateway-svc:
@@ -11,37 +9,8 @@ services:
     ports:
       - '3000:3000'
       - '9229:9229' # Debug port
-    environment:
-      - NODE_ENV=development
-      - PORT=3000
-      - LOG_LEVEL=debug
-      - CORS_ORIGINS=http://localhost:3000,http://localhost:3001
-      # Database
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USERNAME=nexus
-      - DB_PASSWORD=nexus_password
-      - DB_DATABASE=nexus_dev
-      - DB_SYNCHRONIZE=true
-      - DB_LOGGING=true
-      # Redis
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=redis_password
-      - REDIS_DB=0
-      # JWT
-      - JWT_SECRET=dev_jwt_secret_change_in_production
-      - JWT_EXPIRES_IN=15m
-      - JWT_REFRESH_SECRET=dev_refresh_secret_change_in_production
-      - JWT_REFRESH_EXPIRES_IN=7d
-      # Kafka
-      - KAFKA_BROKERS=kafka:9092
-      - KAFKA_CLIENT_ID=nexus-gateway-dev
-      - KAFKA_GROUP_ID=nexus-gateway-dev-group
-      - KAFKA_SSL=false
-      # Rate Limiting
-      - RATE_LIMIT_MAX=1000
-      - RATE_LIMIT_WINDOW_MS=900000
+    env_file:
+      - ./env/.env.docker
     volumes:
       - ./apps/gateway-svc/src:/app/apps/gateway-svc/src:ro
       - ./libs:/app/libs:ro

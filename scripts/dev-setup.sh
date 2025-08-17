@@ -73,8 +73,8 @@ setup_environment() {
     print_status "Setting up environment files..."
     
     if [ ! -f .env ]; then
-        cp .env.development .env
-        print_success "Created .env file from .env.development"
+        cp env/.env.docker .env
+        print_success "Created .env file from env/.env.docker"
     else
         print_warning ".env file already exists, skipping..."
     fi
@@ -85,7 +85,7 @@ start_services() {
     print_status "Building and starting services..."
     docker-compose down --remove-orphans
     docker-compose build --no-cache
-    docker-compose up -d
+    docker-compose up
     print_success "Services started"
 }
 

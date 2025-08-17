@@ -99,7 +99,7 @@ Copy `.env.example` to `.env` and configure the following variables:
 1. Install dependencies: `npm install`
 2. Copy environment file: `cp .env.example .env`
 3. Configure environment variables in `.env`
-4. Start the application: `npm run start:dev`
+4. Start the application: `npm run dev`
 
 ### Testing
 - Run tests: `npm test`
