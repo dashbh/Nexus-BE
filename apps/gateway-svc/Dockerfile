@@ -14,9 +14,6 @@ COPY tsconfig*.json ./
 COPY apps/gateway-svc ./apps/gateway-svc
 COPY libs ./libs
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
-
 # Install dev dependencies for build
 RUN npm ci
 
@@ -55,10 +52,6 @@ USER nestjs
 # Expose port
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node dist/apps/gateway-svc/scripts/health-check.js || exit 1
-
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
@@ -91,10 +84,6 @@ RUN mkdir -p /app/logs
 
 # Expose port and debug port
 EXPOSE 3000 9229
-
-# Health check for development
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD npm run health-check || exit 1
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
