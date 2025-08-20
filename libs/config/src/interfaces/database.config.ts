@@ -7,4 +7,5 @@ export interface DatabaseConfig {
   database: string;
   synchronize: boolean;
   logging: boolean;
+  ssl: boolean;
 }

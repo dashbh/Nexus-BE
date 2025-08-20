@@ -6,7 +6,12 @@ export class GatewaySvcController {
   constructor(private readonly gatewaySvcService: GatewaySvcService) {}
 
   @Get()
-  getHello(): string {
+  async getHello(): Promise<string> {
     return this.gatewaySvcService.getHello();
+  }
+
+  @Get('status')
+  getStatus(): Record<string, unknown> {
+    return this.gatewaySvcService.getStatus();
   }
 }

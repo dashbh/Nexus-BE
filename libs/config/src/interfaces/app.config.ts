@@ -5,4 +5,5 @@ export interface AppConfig {
   corsOrigins: string[];
   rateLimitMax: number;
   rateLimitWindowMs: number;
+  logLevel: string;
 }

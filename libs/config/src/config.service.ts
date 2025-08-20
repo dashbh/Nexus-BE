@@ -22,6 +22,7 @@ export class ConfigService {
           process.env.RATE_LIMIT_WINDOW_MS || '900000',
           10,
         ), // 15 minutes
+        logLevel: process.env.LOG_LEVEL || 'info',
       },
       database: {
         host: process.env.DB_HOST || 'localhost',
@@ -31,12 +32,18 @@ export class ConfigService {
         database: process.env.DB_DATABASE || 'nexus',
         synchronize: process.env.DB_SYNCHRONIZE === 'true',
         logging: process.env.DB_LOGGING === 'true',
+        ssl: process.env.DB_SSL === 'true',
       },
       redis: {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379', 10),
         password: process.env.REDIS_PASSWORD,
         db: parseInt(process.env.REDIS_DB || '0', 10),
+        keyPrefix: process.env.REDIS_KEY_PREFIX || 'nexus:',
+        maxRetriesPerRequest: parseInt(
+          process.env.REDIS_MAX_RETRIES || '3',
+          10,
+        ),
       },
       kafka: {
         brokers: process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'],

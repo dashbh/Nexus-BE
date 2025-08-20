@@ -4,4 +4,6 @@ export interface RedisConfig {
   port: number;
   password?: string;
   db: number;
+  keyPrefix?: string;
+  maxRetriesPerRequest?: number;
 }

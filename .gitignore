@@ -37,10 +37,15 @@ lerna-debug.log*
 
 # dotenv environment variable files
 .env
-.env.development.local
-.env.test.local
-.env.production.local
 .env.local
+.env.*.local
+
+# Environment files with secrets (keep templates)
+!env/.env.template
+!env/.env.development
+!env/.env.docker
+!env/.env.test
+!env/.env.production
 
 # temp directory
 .temp
@@ -54,3 +59,32 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Docker volumes and data
+docker/postgres/data/
+docker/redis/data/
+docker/kafka/data/
+docker/zookeeper/data/
+docker/prometheus/data/
+docker/grafana/data/
+docker/pgadmin/data/
+
+# Docker logs
+docker/nginx/logs/
+apps/gateway-svc/logs/
+
+# SSL certificates (should be managed externally)
+docker/nginx/ssl/*.pem
+docker/nginx/ssl/*.key
+docker/nginx/ssl/*.crt
+
+# Backup files
+*.backup
+*.bak
+*.swp
+*.swo
+*~

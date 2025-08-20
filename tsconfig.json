@@ -22,42 +22,27 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@nexus/config": [
-        "libs/config/src"
-      ],
-      "@nexus/config/*": [
-        "libs/config/src/*"
-      ],
-      "@nexus/errors": [
-        "libs/errors/src"
-      ],
-      "@nexus/errors/*": [
-        "libs/errors/src/*"
-      ],
-      "@nexus/proto": [
-        "libs/proto/src"
-      ],
-      "@nexus/proto/*": [
-        "libs/proto/src/*"
-      ],
-      "@nexus/types": [
-        "libs/types/src"
-      ],
-      "@nexus/types/*": [
-        "libs/types/src/*"
-      ],
-      "@nexus/utils": [
-        "libs/utils/src"
-      ],
-      "@nexus/utils/*": [
-        "libs/utils/src/*"
-      ],
-      "@nexus/validation": [
-        "libs/validation/src"
-      ],
-      "@nexus/validation/*": [
-        "libs/validation/src/*"
-      ]
+      "@nexus/config": ["libs/config/src"],
+      "@nexus/config/*": ["libs/config/src/*"],
+      "@nexus/errors": ["libs/errors/src"],
+      "@nexus/errors/*": ["libs/errors/src/*"],
+      "@nexus/proto": ["libs/proto/src"],
+      "@nexus/proto/*": ["libs/proto/src/*"],
+      "@nexus/types": ["libs/types/src"],
+      "@nexus/types/*": ["libs/types/src/*"],
+      "@nexus/utils": ["libs/utils/src"],
+      "@nexus/utils/*": ["libs/utils/src/*"],
+      "@nexus/validation": ["libs/validation/src"],
+      "@nexus/validation/*": ["libs/validation/src/*"]
     }
-  }
+  },
+  "include": [
+    "apps/**/*",
+    "libs/**/*",
+    "scripts/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
