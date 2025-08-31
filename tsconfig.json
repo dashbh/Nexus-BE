@@ -6,6 +6,7 @@
     "strict": true,
     "moduleResolution": "Node16",
     "declaration": true,
+    "emitDeclarationOnly": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
