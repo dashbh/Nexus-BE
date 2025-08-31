@@ -37,9 +37,10 @@ jobs:
       - name: Archive dist folders
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          mkdir -p artifacts/packages artifacts/apps
-          find packages -name "dist" -type d -exec cp -R {} artifacts/packages/ \;
-          find apps -name "dist" -type d -exec cp -R {} artifacts/apps/ \;
+          mkdir -p artifacts/packages
+          mkdir -p artifacts/apps
+          cp -R packages/*/dist artifacts/packages/
+          cp -R apps/*/dist artifacts/apps/
       
       - name: Upload build artifacts
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
