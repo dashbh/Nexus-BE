@@ -50,6 +50,11 @@ jobs:
           name: nexus-dist
           path: artifacts/
 
+      - name: Test EC2 SSH connectivity
+        run: |
+          echo "Testing SSH connection to ${{ secrets.EC2_HOST }}..."
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_KEY }} -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo Connection successful"
+    
       - name: Deploy to EC2
         uses: appleboy/scp-action@v0.1.2
         with:
@@ -59,6 +64,7 @@ jobs:
           port: ${{ secrets.EC2_PORT || 22 }}
           source: "artifacts/"
           target: "${{ env.DEPLOY_DIR }}"
+          timeout: 120  # seconds
 
       - name: Restart server
         uses: appleboy/ssh-action@v0.1.7
