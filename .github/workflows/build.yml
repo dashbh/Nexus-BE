@@ -1,5 +1,4 @@
-name: Build & Deploy Nexus BE
-
+name: Build Nexus BE
 on:
   push:
     branches:
@@ -7,80 +6,86 @@ on:
   pull_request:
     branches:
       - main
-
 env:
   DEPLOY_DIR: /home/${{ secrets.EC2_USER }}/app
 
 jobs:
-  build-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      # 1. Checkout
-      - uses: actions/checkout@v3
-
-      # 2. Setup Node.js + pnpm
-      - uses: actions/setup-node@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+      
+      - name: Setup Node.js with pnpm
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'pnpm'
           check-latest: true
-      - uses: pnpm/action-setup@v2
-        with:
-          version: latest
-
-      # 3. Install dependencies
-      - run: pnpm install --no-frozen-lockfile
-
-      # 4. Build packages & apps
-      - run: |
-          pnpm --filter './packages/*' run build
-          pnpm --filter './apps/*' run build
-
-      # 5. Archive artifacts
-      - run: |
-          mkdir -p artifacts/packages artifacts/apps
+      
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+      
+      - name: Build packages
+        run: pnpm --filter './packages/*' run build
+      
+      - name: Build apps
+        run: pnpm --filter './apps/*' run build
+      
+      - name: Archive dist folders
+        run: |
+          mkdir -p artifacts/packages
+          mkdir -p artifacts/apps
           cp -R packages/*/dist artifacts/packages/
           cp -R apps/*/dist artifacts/apps/
-
-      # 6. Upload artifact (optional if you want)
-      - uses: actions/upload-artifact@v4
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: nexus-dist
           path: artifacts/
 
-      # 7. Save private key for SSH
-      - run: |
+      - name: Save EC2 private key
+        run: |
           echo "${{ secrets.EC2_KEY }}" > ec2_key.pem
           chmod 600 ec2_key.pem
 
-      # 8. Test SSH (optional but useful)
-      - run: ssh -o StrictHostKeyChecking=no -i ec2_key.pem -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo Connection OK"
-
-      # 9. Deploy via SCP
-      - uses: appleboy/scp-action@v0.1.2
+      - name: Test EC2 SSH connectivity
+        run: |
+          echo "Testing SSH connection to ${{ secrets.EC2_HOST }}..."
+          ssh -o StrictHostKeyChecking=no -i ec2_key.pem -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo Connection successful"
+    
+      - name: Deploy to EC2
+        uses: appleboy/scp-action@v0.1.2
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
-          key: ec2_key.pem
+          key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT || 22 }}
           source: "artifacts/"
           target: "${{ env.DEPLOY_DIR }}"
-          timeout: "180s"
+          timeout: "120s"
 
-      # 10. Restart services via SSH & PM2
-      - uses: appleboy/ssh-action@v0.1.7
+      - name: Restart server
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
-          key: ec2_key.pem
+          key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT || 22 }}
-          timeout: "180s"
           script: |
             set -e
             cd $DEPLOY_DIR/apps
+
             for svc in gateway-svc trading-svc findata-svc notification-svc; do
               cd $DEPLOY_DIR/apps/$svc
               npm install --production
               pm2 restart $svc || pm2 start dist/main.js --name $svc
             done
+
             pm2 save
