@@ -35,12 +35,14 @@ jobs:
         run: pnpm --filter './apps/*' run build
       
       - name: Archive dist folders
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           mkdir -p artifacts/packages artifacts/apps
           find packages -name "dist" -type d -exec cp -R {} artifacts/packages/ \;
           find apps -name "dist" -type d -exec cp -R {} artifacts/apps/ \;
       
       - name: Upload build artifacts
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: nexus-dist
