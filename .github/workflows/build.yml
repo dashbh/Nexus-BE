@@ -50,6 +50,11 @@ jobs:
           name: nexus-dist
           path: artifacts/
 
+      - name: Save EC2 private key
+        run: |
+          echo "${{ secrets.EC2_KEY }}" > ec2_key.pem
+          chmod 600 ec2_key.pem
+
       - name: Test EC2 SSH connectivity
         run: |
           echo "Testing SSH connection to ${{ secrets.EC2_HOST }}..."
