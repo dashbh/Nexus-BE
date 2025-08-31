@@ -48,3 +48,32 @@ jobs:
         with:
           name: nexus-dist
           path: artifacts/
+
+      - name: Deploy to EC2
+        uses: appleboy/scp-action@v0.1.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          port: ${{ secrets.EC2_PORT || 22 }}
+          source: "artifacts/"
+          target: "${{ env.DEPLOY_DIR }}"
+
+      - name: Restart server
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          port: ${{ secrets.EC2_PORT || 22 }}
+          script: |
+            set -e
+            cd $DEPLOY_DIR/apps
+
+            for svc in gateway-svc trading-svc findata-svc notification-svc; do
+              cd $DEPLOY_DIR/apps/$svc
+              npm install --production
+              pm2 restart $svc || pm2 start dist/main.js --name $svc
+            done
+
+            pm2 save
