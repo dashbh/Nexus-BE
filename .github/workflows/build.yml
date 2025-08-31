@@ -58,14 +58,14 @@ jobs:
       - name: Test EC2 SSH connectivity
         run: |
           echo "Testing SSH connection to ${{ secrets.EC2_HOST }}..."
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_KEY }} -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo Connection successful"
+          ssh -o StrictHostKeyChecking=no -i ec2_key.pem -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo Connection successful"
     
       - name: Deploy to EC2
         uses: appleboy/scp-action@v0.1.2
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
+          key: ec2_key.pem
           port: ${{ secrets.EC2_PORT || 22 }}
           source: "artifacts/"
           target: "${{ env.DEPLOY_DIR }}"
