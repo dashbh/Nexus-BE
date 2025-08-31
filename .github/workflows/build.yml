@@ -37,7 +37,7 @@ jobs:
       - name: Build apps
         run: pnpm --filter './apps/*' run build
       
-      - name: Archive dist folders
+      - name: Archive dist folders + node_modules
         run: |
           rm -rf artifacts
           mkdir -p artifacts/packages artifacts/apps
@@ -47,6 +47,10 @@ jobs:
               mkdir -p "artifacts/packages/$(basename $pkg)"
               cp -R "$pkg/dist" "artifacts/packages/$(basename $pkg)/"
               cp "$pkg/package.json" "artifacts/packages/$(basename $pkg)/"
+              # Copy prod node_modules for each package
+              if [ -d "$pkg/node_modules" ]; then
+                cp -R "$pkg/node_modules" "artifacts/packages/$(basename $pkg)/"
+              fi
             fi
           done
           
@@ -55,6 +59,10 @@ jobs:
               mkdir -p "artifacts/apps/$(basename $app)"
               cp -R "$app/dist" "artifacts/apps/$(basename $app)/"
               cp "$app/package.json" "artifacts/apps/$(basename $app)/"
+              # Copy prod node_modules for each app
+              if [ -d "$app/node_modules" ]; then
+                cp -R "$app/node_modules" "artifacts/apps/$(basename $app)/"
+              fi
             fi
           done
       
@@ -76,22 +84,33 @@ jobs:
     
       - name: Deploy & restart services on EC2
         run: |
-          # Ensure the deployment folder exists on EC2
-          ssh -i ec2_key.pem -o StrictHostKeyChecking=no -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p $DEPLOY_DIR"
-        
-          # Copy artifacts to EC2
+          echo "Ensuring deployment folder exists on EC2..."
+          ssh -i ec2_key.pem -o StrictHostKeyChecking=no -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p $DEPLOY_DIR && echo '$DEPLOY_DIR created/existed'"
+
+          echo "Copying artifacts to EC2..."
           scp -i ec2_key.pem -o StrictHostKeyChecking=no -P ${{ secrets.EC2_PORT || 22 }} -r artifacts/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$DEPLOY_DIR/
-        
-          # Restart services via SSH
+          echo "Artifacts copied successfully."
+
+          echo "Restarting services on EC2..."
           ssh -i ec2_key.pem -o StrictHostKeyChecking=no -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           set -e
           export DEPLOY_DIR=/home/${{ secrets.EC2_USER }}/app/nexus-be
-        
+          echo "Navigating to $DEPLOY_DIR/apps..."
+          
           cd $DEPLOY_DIR/apps
           for svc in gateway-svc trading-svc findata-svc notification-svc; do
+            echo "Starting deployment for $svc..."
             cd $DEPLOY_DIR/apps/$svc
-            pnpm install --prod
+            if [ -d "node_modules" ]; then
+              echo "node_modules already present for $svc, skipping install"
+            else
+              echo "Installing production dependencies for $svc..."
+              pnpm install --prod
+            fi
+            echo "Restarting pm2 process for $svc..."
             pm2 restart $svc || pm2 start dist/main.js --name $svc
           done
-        
+
           pm2 save
+          echo "All services restarted successfully."
+EOF
