@@ -1,0 +1,57 @@
+name: Build Nexus BE
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
+      # 3. Setup pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      # 4. Install dependencies
+      - name: Install dependencies
+        run: pnpm install
+
+      # 5. Build packages
+      - name: Build packages
+        run: pnpm --filter './packages/*' run build
+
+      # 6. Build apps
+      - name: Build apps
+        run: pnpm --filter './apps/*' run build
+
+      # 7. Archive the dist folders
+      - name: Archive dist folders
+        run: |
+          mkdir -p artifacts
+          cp -R packages/*/dist artifacts/packages/
+          cp -R apps/*/dist artifacts/apps/
+
+      # 8. Upload build artifacts for next MR (AWS deploy)
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: nexus-dist
+          path: artifacts/
