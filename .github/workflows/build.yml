@@ -1,5 +1,4 @@
 name: Build Nexus BE
-
 on:
   push:
     branches:
@@ -7,46 +6,40 @@ on:
   pull_request:
     branches:
       - main
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      # 1️⃣ Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      # 2️⃣ Setup Node.js and pnpm
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+      
       - name: Setup Node.js with pnpm
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'pnpm'
-          package-manager: 'pnpm'
           check-latest: true
-
-      # 3️⃣ Install dependencies
+      
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      # 4️⃣ Build all packages
+        run: pnpm install
+      
       - name: Build packages
         run: pnpm --filter './packages/*' run build
-
-      # 5️⃣ Build all apps
+      
       - name: Build apps
         run: pnpm --filter './apps/*' run build
-
-      # 6️⃣ Prepare artifacts folder
+      
       - name: Archive dist folders
         run: |
-          mkdir -p artifacts/packages
-          mkdir -p artifacts/apps
-          cp -R packages/*/dist artifacts/packages/
-          cp -R apps/*/dist artifacts/apps/
-
-      # 7️⃣ Upload build artifacts
+          mkdir -p artifacts/packages artifacts/apps
+          find packages -name "dist" -type d -exec cp -R {} artifacts/packages/ \;
+          find apps -name "dist" -type d -exec cp -R {} artifacts/apps/ \;
+      
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
