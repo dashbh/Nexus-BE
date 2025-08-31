@@ -39,10 +39,21 @@ jobs:
       
       - name: Archive dist folders
         run: |
-          mkdir -p artifacts/packages
-          mkdir -p artifacts/apps
-          cp -R packages/*/dist artifacts/packages/
-          cp -R apps/*/dist artifacts/apps/
+          rm -rf artifacts
+          mkdir -p artifacts/packages artifacts/apps
+          
+          # Copy only dist folders
+          for pkg in packages/*; do
+            if [ -d "$pkg/dist" ]; then
+              cp -R "$pkg/dist" "artifacts/packages/$(basename $pkg)"
+            fi
+          done
+          
+          for app in apps/*; do
+            if [ -d "$app/dist" ]; then
+              cp -R "$app/dist" "artifacts/apps/$(basename $app)"
+            fi
+          done
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
