@@ -60,19 +60,24 @@ jobs:
           echo "Testing SSH connection to ${{ secrets.EC2_HOST }}..."
           ssh -o StrictHostKeyChecking=no -i ec2_key.pem -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo Connection successful"
     
-      - name: Deploy to EC2 via SCP
+      - name: Deploy & restart services on EC2
         run: |
-          mkdir -p $DEPLOY_DIR
+          # Ensure the deployment folder exists on EC2
+          ssh -i ec2_key.pem -o StrictHostKeyChecking=no -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p $DEPLOY_DIR"
+        
+          # Copy artifacts to EC2
           scp -i ec2_key.pem -o StrictHostKeyChecking=no -P ${{ secrets.EC2_PORT || 22 }} -r artifacts/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$DEPLOY_DIR/
-
-      - name: Restart server
-        run: |
+        
+          # Restart services via SSH
           ssh -i ec2_key.pem -o StrictHostKeyChecking=no -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           set -e
+          export DEPLOY_DIR=/home/${{ secrets.EC2_USER }}/app/nexus-be
+        
           cd $DEPLOY_DIR/apps
           for svc in gateway-svc trading-svc findata-svc notification-svc; do
             cd $DEPLOY_DIR/apps/$svc
             npm install --production
             pm2 restart $svc || pm2 start dist/main.js --name $svc
           done
+        
           pm2 save
