@@ -46,7 +46,7 @@ jobs:
             if [ -d "$pkg/dist" ]; then
               mkdir -p "artifacts/packages/$(basename $pkg)"
               cp -R "$pkg/dist" "artifacts/packages/$(basename $pkg)/"
-              cp "$pkg/package.json" "$pkg/package-lock.json" "artifacts/packages/$(basename $pkg)/"
+              cp "$pkg/package.json" "artifacts/packages/$(basename $pkg)/"
             fi
           done
           
@@ -54,7 +54,7 @@ jobs:
             if [ -d "$app/dist" ]; then
               mkdir -p "artifacts/apps/$(basename $app)"
               cp -R "$app/dist" "artifacts/apps/$(basename $app)/"
-              cp "$app/package.json" "$app/package-lock.json" "artifacts/apps/$(basename $app)/"
+              cp "$app/package.json" "artifacts/apps/$(basename $app)/"
             fi
           done
       
