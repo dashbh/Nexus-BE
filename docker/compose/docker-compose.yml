@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: nexus-postgres
+    environment:
+      POSTGRES_USER: nexus
+      POSTGRES_PASSWORD: nexus123
+      POSTGRES_DB: nexus_trading
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./configs/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexus"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MongoDB
+  mongodb:
+    image: mongo:7
+    container_name: nexus-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: nexus
+      MONGO_INITDB_ROOT_PASSWORD: nexus123
+      MONGO_INITDB_DATABASE: nexus_market_data
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: nexus-redis
+    command: redis-server --appendonly yes --requirepass nexus123
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Zookeeper (for Kafka)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: nexus-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      test: ["CMD", "nc", "-vz", "localhost", "2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Kafka
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: nexus-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:

@@ -1,0 +1,18 @@
+{
+  "name": "@nexus/proto",
+  "version": "1.0.0",
+  "description": "Protocol buffer definitions for Nexus Trading Platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "pnpm exec tsc",
+    "dev": "pnpm exec tsc --watch",
+    "clean": "rimraf dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "devDependencies": {
+    "rimraf": "^6.0.1",
+    "typescript": "^5.9.2"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@nexus/types",
+  "version": "1.0.0",
+  "description": "Shared TypeScript types for Nexus Trading Platform",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "pnpm exec tsc",
+    "dev": "pnpm exec tsc --watch",
+    "clean": "rimraf dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.15.0",
+  "types": "dist/index.d.ts",
+  "private": "true",
+  "devDependencies": {
+    "rimraf": "^6.0.1",
+    "typescript": "^5.9.2"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "nexus-be",
+  "version": "1.0.0",
+  "packageManager": "pnpm@9.12.0",
+  "description": "Nexus Trading Platform - Backend Microservices",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel --continue",
+    "clean": "turbo run clean",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "install:all": "pnpm install",
+    "docker:up": "docker-compose -f docker/compose/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f docker/compose/docker-compose.yml down",
+    "docker:logs": "docker-compose -f docker/compose/docker-compose.yml logs -f"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.123",
+    "turbo": "^2.5.6",
+    "typescript": "^5.9.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "typescript": "^5.0.0"
+    }
+  },
+  "dependencies": {
+    "@nestjs/cli": "^11.0.10",
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/terminus": "^11.0.0",
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.10",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2"
+  }
+}

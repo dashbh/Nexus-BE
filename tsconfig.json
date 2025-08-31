@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "Node16",
+    "strict": true,
+    "moduleResolution": "Node16",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@nexus/types/*": ["packages/types/src/*"],
+      "@nexus/health/*": ["packages/health/src/*"],
+      "@nexus/validation/*": ["packages/validation/src/*"],
+      "@nexus/errors/*": ["packages/errors/src/*"],
+      "@nexus/config/*": ["packages/config/src/*"],
+      "@nexus/utils/*": ["packages/utils/src/*"],
+      "@nexus/proto/*": ["packages/proto/src/*"]
+    },
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo"
+  },
+  "exclude": ["node_modules", "dist"]
+}

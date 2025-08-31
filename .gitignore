@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Turborepo
+.turbo/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Prevent any compiled files in src directories
+apps/*/src/**/*.js
+apps/*/src/**/*.d.ts
+apps/*/src/**/*.js.map
+packages/*/src/**/*.js
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.js.map
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
+# Docker
+.docker/
+
+# Temporary
+.tmp/
+temp/
