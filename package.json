@@ -6,11 +6,6 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel --continue",
-    "dev:microservices": "concurrently \"npm run dev:findata\" \"npm run dev:notification\" \"npm run dev:trading\" \"npm run dev:gateway\"",
-    "dev:gateway": "cd apps/gateway-svc && npm run start:dev",
-    "dev:findata": "cd apps/findata-svc && TCP_PORT=3001 npm run start:dev",
-    "dev:notification": "cd apps/notification-svc && TCP_PORT=3002 npm run start:dev",
-    "dev:trading": "cd apps/trading-svc && TCP_PORT=3003 npm run start:dev",
     "clean": "turbo run clean",
     "test": "turbo run test",
     "lint": "turbo run lint",
@@ -24,11 +19,6 @@
     "globals": "^16.0.0",
     "turbo": "^2.5.6",
     "typescript": "^5.9.2"
-  },
-  "pnpm": {
-    "overrides": {
-      "typescript": "^5.0.0"
-    }
   },
   "dependencies": {
     "@nestjs/cli": "^11.0.10",
