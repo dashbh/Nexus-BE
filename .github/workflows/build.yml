@@ -90,7 +90,7 @@ jobs:
           cd $DEPLOY_DIR/apps
           for svc in gateway-svc trading-svc findata-svc notification-svc; do
             cd $DEPLOY_DIR/apps/$svc
-            npm install --production
+            pnpm install --prod
             pm2 restart $svc || pm2 start dist/main.js --name $svc
           done
         
