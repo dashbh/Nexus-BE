@@ -7,7 +7,7 @@ on:
     branches:
       - main
 env:
-  DEPLOY_DIR: /home/${{ secrets.EC2_USER }}/app
+  DEPLOY_DIR: /home/${{ secrets.EC2_USER }}/app/nexus-be
 
 jobs:
   build:
