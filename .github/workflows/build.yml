@@ -69,7 +69,7 @@ jobs:
           port: ${{ secrets.EC2_PORT || 22 }}
           source: "artifacts/"
           target: "${{ env.DEPLOY_DIR }}"
-          timeout: 120  # seconds
+          timeout: "120s"
 
       - name: Restart server
         uses: appleboy/ssh-action@v0.1.7
