@@ -1,4 +1,4 @@
-name: Build Nexus BE
+name: Build & Deploy Nexus BE
 on:
   push:
     branches:
@@ -10,68 +10,9 @@ env:
   DEPLOY_DIR: /home/${{ secrets.EC2_USER }}/app/nexus-be
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
-      
-      - name: Setup Node.js with pnpm
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'pnpm'
-          check-latest: true
-      
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-      
-      - name: Build packages
-        run: pnpm --filter './packages/*' run build
-      
-      - name: Build apps
-        run: pnpm --filter './apps/*' run build
-      
-      - name: Archive dist folders + node_modules
-        run: |
-          rm -rf artifacts
-          mkdir -p artifacts/packages artifacts/apps
-          
-          for pkg in packages/*; do
-            if [ -d "$pkg/dist" ]; then
-              mkdir -p "artifacts/packages/$(basename $pkg)"
-              cp -R "$pkg/dist" "artifacts/packages/$(basename $pkg)/"
-              cp "$pkg/package.json" "artifacts/packages/$(basename $pkg)/"
-              # Copy prod node_modules for each package
-              if [ -d "$pkg/node_modules" ]; then
-                cp -R "$pkg/node_modules" "artifacts/packages/$(basename $pkg)/"
-              fi
-            fi
-          done
-          
-          for app in apps/*; do
-            if [ -d "$app/dist" ]; then
-              mkdir -p "artifacts/apps/$(basename $app)"
-              cp -R "$app/dist" "artifacts/apps/$(basename $app)/"
-              cp "$app/package.json" "artifacts/apps/$(basename $app)/"
-              # Copy prod node_modules for each app
-              if [ -d "$app/node_modules" ]; then
-                cp -R "$app/node_modules" "artifacts/apps/$(basename $app)/"
-              fi
-            fi
-          done
-      
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: nexus-dist
-          path: artifacts/
-
       - name: Save EC2 private key
         run: |
           echo "${{ secrets.EC2_KEY }}" | tr -d '\r' > ec2_key.pem
@@ -81,35 +22,44 @@ jobs:
         run: |
           echo "Testing SSH connection to ${{ secrets.EC2_HOST }}..."
           ssh -o StrictHostKeyChecking=no -i ec2_key.pem -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo Connection successful"
-    
+
       - name: Deploy & restart services on EC2
         run: |
-          echo "Ensuring deployment folder exists on EC2..."
-          ssh -i ec2_key.pem -o StrictHostKeyChecking=no -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p $DEPLOY_DIR && echo '$DEPLOY_DIR created/existed'"
-
-          echo "Copying artifacts to EC2..."
-          scp -i ec2_key.pem -o StrictHostKeyChecking=no -P ${{ secrets.EC2_PORT || 22 }} -r artifacts/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$DEPLOY_DIR/
-          echo "Artifacts copied successfully."
-
-          echo "Restarting services on EC2..."
           ssh -i ec2_key.pem -o StrictHostKeyChecking=no -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           set -e
           export DEPLOY_DIR=/home/${{ secrets.EC2_USER }}/app/nexus-be
-          echo "Navigating to $DEPLOY_DIR/apps..."
-          
+          echo "Ensuring deployment folder exists..."
+          mkdir -p $DEPLOY_DIR
+
+          echo "Navigating to deployment folder..."
+          cd $DEPLOY_DIR
+
+          if [ -d ".git" ]; then
+            echo "Pulling latest changes from main branch..."
+            git reset --hard
+            git pull origin main
+          else
+            echo "Cloning repository..."
+            git clone https://github.com/$GITHUB_REPOSITORY.git $DEPLOY_DIR
+          fi
+
+          echo "Installing dependencies..."
+          pnpm install --no-frozen-lockfile
+
+          echo "Building packages..."
+          pnpm --filter './packages/*' run build
+
+          echo "Building apps..."
+          pnpm --filter './apps/*' run build
+
+          echo "Restarting services..."
           cd $DEPLOY_DIR/apps
           for svc in gateway-svc trading-svc findata-svc notification-svc; do
-            echo "Starting deployment for $svc..."
+            echo "Deploying $svc..."
             cd $DEPLOY_DIR/apps/$svc
-            if [ -d "node_modules" ]; then
-              echo "node_modules already present for $svc, skipping install"
-            else
-              echo "Installing production dependencies for $svc..."
-              pnpm install --prod
-            fi
-            echo "Restarting pm2 process for $svc..."
             pm2 restart $svc || pm2 start dist/main.js --name $svc
           done
 
           pm2 save
-          echo "All services restarted successfully."
+          echo "Deployment completed successfully."
+          EOF
