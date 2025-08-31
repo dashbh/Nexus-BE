@@ -5,6 +5,7 @@
     "module": "Node16",
     "strict": true,
     "moduleResolution": "Node16",
+    "declaration": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,

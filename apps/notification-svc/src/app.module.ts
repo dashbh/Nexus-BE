@@ -4,7 +4,9 @@ import { AppService } from './app.service';
 import { HealthModule } from '@nexus/health';
 
 @Module({
-  imports: [HealthModule.forRoot({ serviceName: 'notification-svc', version: '1.0.0' })],
+  imports: [
+    HealthModule.forRoot({ serviceName: 'notification-svc', version: '1.0.0' }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

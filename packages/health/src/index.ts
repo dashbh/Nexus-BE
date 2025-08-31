@@ -1,3 +1,3 @@
-export * from './health.module';
-export * from './health.service';
-export * from './health.controller';
+export { HealthModule } from './health.module';
+export { HealthService } from './health.service';
+export { HealthController } from './health.controller';
