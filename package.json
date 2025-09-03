@@ -5,6 +5,7 @@
   "description": "Nexus Trading Platform - Backend Microservices",
   "scripts": {
     "build": "turbo run build",
+    "build:prod": "cross-env NODE_ENV=production turbo run build:prod --concurrency=30%",
     "dev": "turbo run dev --parallel --continue",
     "clean": "turbo run clean",
     "test": "turbo run test",
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.19.123",
+    "cross-env": "^10.0.0",
     "globals": "^16.0.0",
     "turbo": "^2.5.6",
     "typescript": "^5.9.2"
