@@ -69,6 +69,15 @@ jobs:
           ssh -i ec2_key.pem -o StrictHostKeyChecking=no -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << EOF
           set -e
           cd $DEPLOY_DIR
+          # Install dependencies for each service
+          for svc in apps/* packages/*; do
+            if [ -f "$svc/package.json" ]; then
+              echo "📦 Installing deps in $svc"
+              cd $svc
+              pnpm install --prod --no-frozen-lockfile
+              cd -
+            fi
+          done
           if pm2 describe gateway-svc >/dev/null 2>&1; then
             echo "🔄 Restarting services..."
             pm2 restart ecosystem.config.js --env production
