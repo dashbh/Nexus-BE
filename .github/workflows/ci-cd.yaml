@@ -69,6 +69,7 @@ jobs:
           ssh -i ec2_key.pem -o StrictHostKeyChecking=no -p ${{ secrets.EC2_PORT || 22 }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << EOF
           set -e
           cd $DEPLOY_DIR
+<<<<<<< HEAD
           if pm2 describe gateway-svc >/dev/null 2>&1; then
             echo "🔄 Restarting services..."
             pm2 restart ecosystem.config.js --env production
@@ -77,4 +78,8 @@ jobs:
             pm2 start ecosystem.config.js --env production
           fi
           pm2 save
+=======
+          # Your app-specific restart logic
+          pm2 restart all || true
+>>>>>>> ed300e0079c8f9922c8d0d695822c413ec651c15
           EOF
