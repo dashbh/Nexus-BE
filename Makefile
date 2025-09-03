@@ -21,7 +21,7 @@ build:
 	@echo "🔨 Running build step"
 	@if [ -f package.json ]; then \
 		echo "Running pnpm build..."; \
-		pnpm run build:prod || true; \
+		pnpm run build || true; \
 	fi
 
 ## Extract dist + lockfiles into artifacts dir
