@@ -55,6 +55,11 @@ extract-artifacts:
 		fi \
 	done
 
+	@if [ -f ecosystem.config.js ]; then \
+		cp ecosystem.config.js $(ARTIFACTS_DIR)/; \
+		echo "   ✔ copied ecosystem.config.js → $(ARTIFACTS_DIR)"; \
+	fi
+
 	@echo "✅ Extraction complete"
 
 ## Package artifacts into tarball for CI/CD (ready to push/upload)
