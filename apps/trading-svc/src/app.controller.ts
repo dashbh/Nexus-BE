@@ -1,26 +1,45 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { AppService } from './app.service';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @MessagePattern('trading.getOrders')
-  getOrders(): any {
-    return {
-      service: 'trading-svc',
-      data: {
-        orders: [
-          { id: 'ORD001', symbol: 'AAPL', type: 'BUY', quantity: 100, price: 150.25, status: 'FILLED', timestamp: new Date().toISOString() },
-          { id: 'ORD002', symbol: 'GOOGL', type: 'SELL', quantity: 50, price: 2750.80, status: 'PENDING', timestamp: new Date().toISOString() },
-          { id: 'ORD003', symbol: 'TSLA', type: 'BUY', quantity: 200, price: 245.67, status: 'CANCELLED', timestamp: new Date().toISOString() }
-        ],
-        totalOrders: 3,
-        activeOrders: 1,
-        timestamp: new Date().toISOString()
-      },
-      status: 'success'
-    };
+  @MessagePattern({ cmd: 'getOrders' })
+  getOrdersMessage() {
+    const mockPath = path.resolve(__dirname, '../mock.json');
+    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    return data.orders;
+  }
+
+  @MessagePattern({ cmd: 'getOrderById' })
+  getOrderByIdMessage(payload: { id: string }) {
+    const mockPath = path.resolve(__dirname, '../mock.json');
+    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    return data.orders.find((o: any) => o.id === payload.id);
+  }
+
+  @MessagePattern({ cmd: 'getOrdersByUser' })
+  getOrdersByUserMessage(payload: { userId: string }) {
+    const mockPath = path.resolve(__dirname, '../mock.json');
+    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    return data.orders.filter((o: any) => o.userId === payload.userId);
+  }
+
+  @MessagePattern({ cmd: 'getExecutions' })
+  getExecutionsMessage() {
+    const mockPath = path.resolve(__dirname, '../mock.json');
+    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    return data.executions;
+  }
+
+  @MessagePattern({ cmd: 'getExecutionsByOrder' })
+  getExecutionsByOrderMessage(payload: { orderId: string }) {
+    const mockPath = path.resolve(__dirname, '../mock.json');
+    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    return data.executions.filter((e: any) => e.orderId === payload.orderId);
   }
 }

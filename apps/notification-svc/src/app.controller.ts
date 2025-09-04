@@ -1,25 +1,23 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { AppService } from './app.service';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
+  @MessagePattern({ cmd: 'getNotifications' })
+  getNotificationsMessage() {
+    const mockPath = path.resolve(__dirname, '../mock.json');
+    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    return data.notifications;
+  }
 
-  @MessagePattern('notification.getNotifications')
-  getNotifications(): any {
-    return {
-      service: 'notification-svc',
-      data: {
-        notifications: [
-          { id: 1, type: 'alert', message: 'Market volatility detected', priority: 'high', timestamp: new Date().toISOString() },
-          { id: 2, type: 'info', message: 'Daily report ready', priority: 'medium', timestamp: new Date().toISOString() },
-          { id: 3, type: 'warning', message: 'API rate limit approaching', priority: 'low', timestamp: new Date().toISOString() }
-        ],
-        unreadCount: 2,
-        timestamp: new Date().toISOString()
-      },
-      status: 'success'
-    };
+  @MessagePattern({ cmd: 'getNotificationsByUser' })
+  getNotificationsByUserMessage(payload: { userId: string }) {
+    const mockPath = path.resolve(__dirname, '../mock.json');
+    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    return data.notifications.filter((n: any) => n.userId === payload.userId);
   }
 }

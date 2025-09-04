@@ -1,7 +1,4 @@
 /** @type {import('pm2').ModuleOptions[]} */
-const dotenv = require('dotenv');
-dotenv.config({ path: './.env.production' });
-
 module.exports = {
     apps: [
         {
@@ -10,7 +7,7 @@ module.exports = {
             watch: false,
             env_production: {
                 NODE_ENV: 'production',
-                PORT: process.env.GATEWAY_PORT,
+                PORT: 3000,
             },
         },
         {
@@ -19,7 +16,7 @@ module.exports = {
             watch: false,
             env_production: {
                 NODE_ENV: 'production',
-                PORT: process.env.FINDATA_PORT,
+                PORT: 3001,
             },
         },
         {
@@ -28,7 +25,7 @@ module.exports = {
             watch: false,
             env_production: {
                 NODE_ENV: 'production',
-                PORT: process.env.TRADING_PORT,
+                PORT: 3002,
             },
         },
         {
@@ -37,7 +34,7 @@ module.exports = {
             watch: false,
             env_production: {
                 NODE_ENV: 'production',
-                PORT: process.env.NOTIFICATION_PORT,
+                PORT: 3003,
             },
         },
     ],

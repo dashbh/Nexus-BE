@@ -1,25 +1,37 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { AppService } from './app.service';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
+  @MessagePattern({ cmd: 'getPortfolio' })
+  getPortfolioMessage() {
+    const mockPath = path.resolve(__dirname, '../mock.json');
+    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    return data.portfolio;
+  }
 
-  @MessagePattern('findata.getData')
-  getData(): any {
-    return {
-      service: 'findata-svc',
-      data: {
-        stocks: [
-          { symbol: 'AAPL', price: 150.25, change: '+2.5%' },
-          { symbol: 'GOOGL', price: 2750.80, change: '-1.2%' },
-          { symbol: 'TSLA', price: 245.67, change: '+5.8%' }
-        ],
-        timestamp: new Date().toISOString(),
-        market: 'NASDAQ'
-      },
-      status: 'success'
-    };
+  @MessagePattern({ cmd: 'getPortfolioByUser' })
+  getPortfolioByUserMessage(payload: { userId: string }) {
+    const mockPath = path.resolve(__dirname, '../mock.json');
+    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    return data.portfolio.filter((p: any) => p.userId === payload.userId);
+  }
+
+  @MessagePattern({ cmd: 'getMarketData' })
+  getMarketDataMessage() {
+    const mockPath = path.resolve(__dirname, '../mock.json');
+    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    return data.marketdata;
+  }
+
+  @MessagePattern({ cmd: 'getMarketDataBySymbol' })
+  getMarketDataBySymbolMessage(payload: { symbol: string }) {
+    const mockPath = path.resolve(__dirname, '../mock.json');
+    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    return data.marketdata.find((m: any) => m.symbol === payload.symbol);
   }
 }
