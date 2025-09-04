@@ -7,11 +7,11 @@ async function bootstrap() {
     transport: Transport.TCP,
     options: {
       host: '0.0.0.0',
-      port: parseInt(process.env.TCP_PORT ?? '3001'),
+      port: parseInt(process.env.PORT ?? '3001'),
     },
   });
-  
+
   await app.listen();
-  console.log('Findata microservice is listening on TCP port', process.env.TCP_PORT ?? '3001');
+  console.log('Findata microservice is listening on TCP port', process.env.PORT);
 }
 bootstrap();
