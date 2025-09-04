@@ -9,7 +9,7 @@ async function bootstrap() {
       transport: Transport.TCP,
       options: {
         host: '0.0.0.0',
-        port: parseInt(process.env.TCP_PORT ?? '3002'),
+        port: parseInt(process.env.TCP_PORT ?? '3003'),
       },
     },
   );
@@ -17,7 +17,7 @@ async function bootstrap() {
   await app.listen();
   console.log(
     'Notification microservice is listening on TCP port',
-    process.env.TCP_PORT ?? '3002',
+    process.env.TCP_PORT ?? '3003',
   );
 }
 void bootstrap();
