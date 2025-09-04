@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { AppService } from './app.service';
 import * as fs from 'fs';
 import * as path from 'path';
-
+import * as data from '../mock.json';
 @Controller()
 export class AppController {
   constructor(
@@ -45,15 +45,15 @@ export class AppController {
 
   @Get('users')
   getUsers() {
-    const mockPath = path.resolve(__dirname, '../mock.json');
-    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    // const mockPath = path.resolve(__dirname, '../mock.json');
+    // const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
     return data.users;
   }
 
   @Get('users/:id')
   getUserById(@Param('id') id: string) {
-    const mockPath = path.resolve(__dirname, '../mock.json');
-    const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
+    // const mockPath = path.resolve(__dirname, '../mock.json');
+    // const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
     return data.users.find((u: any) => u.id === id);
   }
 
