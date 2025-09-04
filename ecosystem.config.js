@@ -1,4 +1,8 @@
 /** @type {import('pm2').ModuleOptions[]} */
+
+const dotenv = require('dotenv');
+dotenv.config({ path: '.env.production' });
+
 module.exports = {
     apps: [
         {
@@ -6,12 +10,8 @@ module.exports = {
             script: 'apps/gateway-svc/dist/main.js',
             watch: false,
             env: {
-                NODE_ENV: 'development',
-                PORT: 3000,
-            },
-            env_production: {
                 NODE_ENV: 'production',
-                PORT: 3000,
+                PORT: process.env.GATEWAY_PORT,
             },
         },
         {
@@ -19,12 +19,8 @@ module.exports = {
             script: 'apps/findata-svc/dist/main.js',
             watch: false,
             env: {
-                NODE_ENV: 'development',
-                TCP_PORT: 3001,
-            },
-            env_production: {
                 NODE_ENV: 'production',
-                TCP_PORT: 3001,
+                PORT: process.env.FINDATA_PORT,
             },
         },
         {
@@ -32,12 +28,8 @@ module.exports = {
             script: 'apps/trading-svc/dist/main.js',
             watch: false,
             env: {
-                NODE_ENV: 'development',
-                TCP_PORT: 3002,
-            },
-            env_production: {
                 NODE_ENV: 'production',
-                TCP_PORT: 3002,
+                PORT: process.env.TRADING_PORT,
             },
         },        
         {
@@ -45,12 +37,8 @@ module.exports = {
             script: 'apps/notification-svc/dist/main.js',
             watch: false,
             env: {
-                NODE_ENV: 'development',
-                TCP_PORT: 3003,
-            },
-            env_production: {
                 NODE_ENV: 'production',
-                TCP_PORT: 3003,
+                PORT: process.env.NOTIFICATION_PORT,
             },
         },
     ],
