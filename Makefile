@@ -55,7 +55,7 @@ extract-artifacts:
 		fi \
 	done
 
-	@for file in pnpm-workspace.yaml package.json package-lock.json pnpm-lock.yaml turbo.json ecosystem.config.js; do \
+	@for file in pnpm-workspace.yaml package.json package-lock.json pnpm-lock.yaml turbo.json ecosystem.config.js .env.production; do \
 		if [ -f $$file ]; then \
 			cp $$file $(ARTIFACTS_DIR)/; \
 			echo "   ✔ copied $$file → $(ARTIFACTS_DIR)"; \
