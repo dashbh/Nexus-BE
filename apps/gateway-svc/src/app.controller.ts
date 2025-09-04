@@ -2,9 +2,7 @@ import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { AppService } from './app.service';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as data from '../mock.json';
+import mockData from '../mock.json';
 @Controller()
 export class AppController {
   constructor(
@@ -45,16 +43,12 @@ export class AppController {
 
   @Get('users')
   getUsers() {
-    // const mockPath = path.resolve(__dirname, '../mock.json');
-    // const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
-    return data.users;
+    return mockData.users;
   }
 
   @Get('users/:id')
   getUserById(@Param('id') id: string) {
-    // const mockPath = path.resolve(__dirname, '../mock.json');
-    // const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
-    return data.users.find((u: any) => u.id === id);
+    return mockData.users.find((u: any) => u.id === id);
   }
 
   // Proxy endpoints

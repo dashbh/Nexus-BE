@@ -1,9 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { AppService } from './app.service';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as data from '../mock.json';
+import mockData from '../mock.json';
 
 @Controller()
 export class AppController {
@@ -11,36 +9,26 @@ export class AppController {
 
   @MessagePattern({ cmd: 'getOrders' })
   getOrdersMessage() {
-    // const mockPath = path.resolve(__dirname, '../mock.json');
-    // const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
-    return data.orders;
+    return mockData.orders;
   }
 
   @MessagePattern({ cmd: 'getOrderById' })
   getOrderByIdMessage(payload: { id: string }) {
-    // const mockPath = path.resolve(__dirname, '../mock.json');
-    // const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
-    return data.orders.find((o: any) => o.id === payload.id);
+    return mockData.orders.find((o: any) => o.id === payload.id);
   }
 
   @MessagePattern({ cmd: 'getOrdersByUser' })
   getOrdersByUserMessage(payload: { userId: string }) {
-    // const mockPath = path.resolve(__dirname, '../mock.json');
-    // const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
-    return data.orders.filter((o: any) => o.userId === payload.userId);
+    return mockData.orders.filter((o: any) => o.userId === payload.userId);
   }
 
   @MessagePattern({ cmd: 'getExecutions' })
   getExecutionsMessage() {
-    // const mockPath = path.resolve(__dirname, '../mock.json');
-    // const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
-    return data.executions;
+    return mockData.executions;
   }
 
   @MessagePattern({ cmd: 'getExecutionsByOrder' })
   getExecutionsByOrderMessage(payload: { orderId: string }) {
-    // const mockPath = path.resolve(__dirname, '../mock.json');
-    // const data = JSON.parse(fs.readFileSync(mockPath, 'utf-8'));
-    return data.executions.filter((e: any) => e.orderId === payload.orderId);
+    return mockData.executions.filter((e: any) => e.orderId === payload.orderId);
   }
 }
