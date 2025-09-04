@@ -9,16 +9,13 @@ async function bootstrap() {
       transport: Transport.TCP,
       options: {
         host: '0.0.0.0',
-        port: parseInt(process.env.TCP_PORT ?? '3002'),
+        port: parseInt(process.env.PORT ?? '3002'),
       },
     },
   );
 
   await app.listen();
-  console.log(
-    'Trading microservice is listening on TCP port',
-    process.env.TCP_PORT ?? '3002',
-  );
+  console.log('Trading microservice is listening on TCP port', process.env.PORT,);
 }
 
 void bootstrap();
