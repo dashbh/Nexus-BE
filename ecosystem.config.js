@@ -5,7 +5,7 @@ module.exports = {
             name: 'gateway-svc',
             script: 'apps/gateway-svc/dist/main.js',
             watch: false,
-            env: {
+            env_production: {
                 NODE_ENV: 'production',
                 PORT: process.env.GATEWAY_PORT,
             },
@@ -14,7 +14,7 @@ module.exports = {
             name: 'findata-svc',
             script: 'apps/findata-svc/dist/main.js',
             watch: false,
-            env: {
+            env_production: {
                 NODE_ENV: 'production',
                 PORT: process.env.FINDATA_PORT,
             },
@@ -23,16 +23,16 @@ module.exports = {
             name: 'trading-svc',
             script: 'apps/trading-svc/dist/main.js',
             watch: false,
-            env: {
+            env_production: {
                 NODE_ENV: 'production',
                 PORT: process.env.TRADING_PORT,
             },
-        },        
+        },
         {
             name: 'notification-svc',
             script: 'apps/notification-svc/dist/main.js',
             watch: false,
-            env: {
+            env_production: {
                 NODE_ENV: 'production',
                 PORT: process.env.NOTIFICATION_PORT,
             },
