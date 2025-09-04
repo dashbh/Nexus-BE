@@ -74,10 +74,10 @@ jobs:
 
           if pm2 describe gateway-svc >/dev/null 2>&1; then
             echo "🔄 Restarting services..."
-            pm2 restart ecosystem.config.js --env-file .env.production
+            pm2 restart ecosystem.config.js
           else
             echo "🚀 Starting services..."
-            pm2 start ecosystem.config.js --env-file .env.production
+            pm2 start ecosystem.config.js
           fi
           pm2 save
           EOF
