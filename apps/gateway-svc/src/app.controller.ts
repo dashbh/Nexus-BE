@@ -2,7 +2,7 @@ import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { AppService } from './app.service';
-import mockData from '../mock.json';
+import mockData from './mock.json';
 @Controller()
 export class AppController {
   constructor(
