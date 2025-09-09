@@ -7,7 +7,6 @@ module.exports = {
             watch: false,
             env_production: {
                 NODE_ENV: 'production',
-                PORT: 3000,
             },
         },
         {
@@ -16,7 +15,6 @@ module.exports = {
             watch: false,
             env_production: {
                 NODE_ENV: 'production',
-                PORT: 3001,
             },
         },
         {
@@ -25,7 +23,6 @@ module.exports = {
             watch: false,
             env_production: {
                 NODE_ENV: 'production',
-                PORT: 3002,
             },
         },
         {
@@ -34,7 +31,6 @@ module.exports = {
             watch: false,
             env_production: {
                 NODE_ENV: 'production',
-                PORT: 3003,
             },
         },
     ],
