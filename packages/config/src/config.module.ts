@@ -24,18 +24,18 @@ import * as path from 'path';
   ],
   exports: [ConfigModule],
 })
-export class CommonConfigModule {}
+export class NexusConfigModule { }
 
 function getEnvFilePath(): string {
   const nodeEnv = process.env.NODE_ENV || 'development';
   const envFile = `.env.${nodeEnv}`;
   const fallbackFile = '.env';
-  
+
   // Check if environment-specific file exists
   if (fs.existsSync(path.resolve(process.cwd(), envFile))) {
     return envFile;
   }
-  
+
   // Fallback to .env
   return fallbackFile;
 }

@@ -3,36 +3,45 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthModule } from '@nexus/health';
-import { CommonConfigModule } from '@nexus/config';
+import { NexusConfigModule, ConfigService } from '@nexus/config';
 
 @Module({
   imports: [
-    CommonConfigModule,
+    NexusConfigModule,
     HealthModule.forRoot({ serviceName: 'gateway-svc', version: '1.0.0' }),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'FINDATA_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: process.env.FINDATA_HOST ?? 'localhost',
-          port: parseInt(process.env.FINDATA_PORT ?? '3001'),
-        },
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.get<string>('FINDATA_HOST') || 'localhost',
+            port: configService.get<number>('FINDATA_PORT') || 3001,
+          },
+        }),
+        inject: [ConfigService],
       },
       {
         name: 'NOTIFICATION_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: process.env.NOTIFICATION_HOST ?? 'localhost',
-          port: parseInt(process.env.NOTIFICATION_PORT ?? '3002'),
-        },
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.get<string>('NOTIFICATION_HOST') || 'localhost',
+            port: configService.get<number>('NOTIFICATION_PORT') || 3002,
+          },
+        }),
+        inject: [ConfigService],
       },
       {
         name: 'TRADING_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: process.env.TRADING_HOST ?? 'localhost',
-          port: parseInt(process.env.TRADING_PORT ?? '3003'),
-        },
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.get<string>('TRADING_HOST') || 'localhost',
+            port: configService.get<number>('TRADING_PORT') || 3003,
+          },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],

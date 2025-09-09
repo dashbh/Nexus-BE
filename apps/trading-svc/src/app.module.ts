@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthModule } from '@nexus/health';
-import { CommonConfigModule } from '@nexus/config';
+import { NexusConfigModule } from '@nexus/config';
 
 @Module({
   imports: [
-    CommonConfigModule,
+    NexusConfigModule,
     HealthModule.forRoot({ serviceName: 'trading-svc', version: '1.0.0' }),
   ],
   controllers: [AppController],
