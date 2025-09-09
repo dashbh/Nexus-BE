@@ -21,7 +21,7 @@ import { HealthModule } from '@nexus/health';
         transport: Transport.TCP,
         options: {
           host: process.env.NOTIFICATION_HOST ?? 'localhost',
-          port: parseInt(process.env.NOTIFICATION_PORT ?? '3002'),
+          port: parseInt(process.env.NOTIFICATION_PORT ?? '3003'),
         },
       },
       {
@@ -29,7 +29,7 @@ import { HealthModule } from '@nexus/health';
         transport: Transport.TCP,
         options: {
           host: process.env.TRADING_HOST ?? 'localhost',
-          port: parseInt(process.env.TRADING_PORT ?? '3003'),
+          port: parseInt(process.env.TRADING_PORT ?? '3002'),
         },
       },
     ]),
