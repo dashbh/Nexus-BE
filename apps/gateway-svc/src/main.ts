@@ -10,7 +10,7 @@ async function bootstrap() {
   });
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT') || 3000;
+  const port = configService.get<number>('GATEWAY_PORT') || configService.get<number>('PORT') || 3000;
   await app.listen(port);
   console.log(`🚀 ${configService.get('NODE_ENV')} mode on port ${port}`);
 }

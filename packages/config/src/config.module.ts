@@ -14,6 +14,13 @@ import * as path from 'path';
           .valid('development', 'staging', 'production')
           .default('development'),
         PORT: Joi.number().default(3000),
+        GATEWAY_PORT: Joi.number().optional(),
+        FINDATA_PORT: Joi.number().optional(),
+        TRADING_PORT: Joi.number().optional(),
+        NOTIFICATION_PORT: Joi.number().optional(),
+        FINDATA_HOST: Joi.string().optional(),
+        TRADING_HOST: Joi.string().optional(),
+        NOTIFICATION_HOST: Joi.string().optional(),
         DATABASE_URL: Joi.string().optional(),
       }),
       validationOptions: {
