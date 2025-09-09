@@ -1,1 +1,2 @@
-// Placeholder for config package
+export { CommonConfigModule } from './config.module';
+export { ConfigService } from '@nestjs/config';

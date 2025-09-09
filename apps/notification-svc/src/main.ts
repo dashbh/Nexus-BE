@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
+import { ConfigService } from '@nexus/config';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -13,8 +14,10 @@ async function bootstrap() {
       },
     },
   );
-
+  
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('PORT') || 3003;
   await app.listen();
-  console.log('Notification microservice is listening on TCP port', process.env.PORT,);
+  console.log(`🚀 ${configService.get('NODE_ENV')} mode on port ${port}`);
 }
 void bootstrap();
