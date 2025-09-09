@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { AppService } from './app.service';
-import mockData from '../mock.json';
+import mockData from './mock.json';
 
 @Controller()
 export class AppController {
